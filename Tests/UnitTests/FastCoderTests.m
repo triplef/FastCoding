@@ -196,25 +196,28 @@
     //create index set
     NSIndexSet *input = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(1, 99)];
     
-    //convert to FastCoded data
-    NSData *data = [FastCoder dataWithRootObject:input];
-    id output = [FastCoder objectWithData:data];
-  
-    //check
-    XCTAssertEqualObjects(input, output);
+    // Should throw exception as NSIndexSet is disabled
+    XCTAssertThrows([FastCoder dataWithRootObject:input]);
     
-    //create mutable index set
-    input = [NSMutableIndexSet indexSet];
-    [(NSMutableIndexSet *)input addIndexesInRange:NSMakeRange(0, 30)];
-    [(NSMutableIndexSet *)input addIndexesInRange:NSMakeRange(50, 80)];
-    
-    //convert to FastCoded data
-    data = [FastCoder dataWithRootObject:input];
-    output = [FastCoder objectWithData:data];
-    
-    //check
-    XCTAssertEqualObjects(input, output);
-    XCTAssertEqualObjects([output classForCoder], [NSMutableIndexSet class]);
+//    //convert to FastCoded data
+//    NSData *data = [FastCoder dataWithRootObject:input];
+//    id output = [FastCoder objectWithData:data];
+//
+//    //check
+//    XCTAssertEqualObjects(input, output);
+//
+//    //create mutable index set
+//    input = [NSMutableIndexSet indexSet];
+//    [(NSMutableIndexSet *)input addIndexesInRange:NSMakeRange(0, 30)];
+//    [(NSMutableIndexSet *)input addIndexesInRange:NSMakeRange(50, 80)];
+//
+//    //convert to FastCoded data
+//    data = [FastCoder dataWithRootObject:input];
+//    output = [FastCoder objectWithData:data];
+//
+//    //check
+//    XCTAssertEqualObjects(input, output);
+//    XCTAssertEqualObjects([output classForCoder], [NSMutableIndexSet class]);
 }
 
 - (void)testDateAlignment
