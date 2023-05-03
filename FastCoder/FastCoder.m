@@ -746,8 +746,15 @@ static id FCReadObject32(__unsafe_unretained FCNSDecoder *decoder)
 
 static id FCReadURL(__unsafe_unretained FCNSDecoder *decoder)
 {
-    __autoreleasing NSURL *URL = [NSURL URLWithString:FCReadObject(decoder) relativeToURL:FCReadObject(decoder)];
+    id obj1 = FCReadObject(decoder);
+    id obj2 = FCReadObject(decoder);
+
+    __autoreleasing NSURL *URL = [NSURL URLWithString:obj1 relativeToURL:obj2];
+
+#ifndef GNUSTEP
     FCCacheParsedObject(URL, decoder->_stringCache);
+#endif
+    
     return URL;
 }
 
