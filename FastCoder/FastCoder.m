@@ -1962,6 +1962,9 @@ static void FCWriteObject(__unsafe_unretained id object, __unsafe_unretained FCN
 
 - (void)FC_encodeWithCoder:(__unsafe_unretained FCNSCoder *)coder
 {
+    [NSException raise:FastCodingException format:@"FastCoding is not available for NSIndexSet in this version."];
+
+#ifndef GNUSTEP
     if (FCWriteObjectAlias(self, coder)) return;
     
     BOOL mutable = ([self classForCoder] == [NSMutableIndexSet class]);
@@ -1981,6 +1984,7 @@ static void FCWriteObject(__unsafe_unretained id object, __unsafe_unretained FCN
     }];
     
     if (!mutable) FCCacheWrittenObject(self, coder->_objectCache);
+#endif
 }
 
 @end
