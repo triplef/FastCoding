@@ -243,7 +243,7 @@ static CFHashCode	FCHashCallback(const void *value)
 
 static inline NSUInteger FCCacheParsedObject(__unsafe_unretained id object, __unsafe_unretained NSData *cache)
 {
-    NSUInteger offset = (NSUInteger)CFDataGetLength((CFMutableDataRef)cache);
+	NSUInteger offset = (NSUInteger)CFDataGetLength((__bridge CFMutableDataRef)cache);
     
 #if FC_DIAGNOSTIC_ENABLED
     
@@ -253,24 +253,24 @@ static inline NSUInteger FCCacheParsedObject(__unsafe_unretained id object, __un
     
 #endif
     
-    CFDataAppendBytes((CFMutableDataRef)cache, (void *)&object, sizeof(id));
+	CFDataAppendBytes((__bridge CFMutableDataRef)cache, (void *)&object, sizeof(id));
     return offset;
 }
 
 static inline void FCReplaceCachedObject(NSUInteger offset, __unsafe_unretained id object, __unsafe_unretained NSData *cache)
 {
-    CFDataReplaceBytes((CFMutableDataRef)cache, CFRangeMake((CFIndex)offset, sizeof(id)), (void *)&object, sizeof(id));
+	CFDataReplaceBytes((__bridge CFMutableDataRef)cache, CFRangeMake((CFIndex)offset, sizeof(id)), (void *)&object, sizeof(id));
 }
 
 static inline id FCCachedObjectAtIndex(NSUInteger index, __unsafe_unretained NSData *cache)
 {
-    NSUInteger count = (NSUInteger)CFDataGetLength((CFMutableDataRef)cache) / (NSUInteger)sizeof(id);
+	NSUInteger count = (NSUInteger)CFDataGetLength((__bridge CFMutableDataRef)cache) / (NSUInteger)sizeof(id);
     if (index >= count)
     {
         [NSException raise:FastCodingException format:@"Attempted to read cache object at index %tu, but cache object count is %tu", index, count];
         return [NSNull null];
     }
-    return ((__unsafe_unretained id *)(void *)CFDataGetBytePtr((CFMutableDataRef)cache))[index];
+	return ((__unsafe_unretained id *)(void *)CFDataGetBytePtr((__bridge CFMutableDataRef)cache))[index];
 }
 
 
@@ -450,7 +450,7 @@ static id FCReadMutableDictionary(__unsafe_unretained FCNSDecoder *decoder)
     {
         __autoreleasing id object = FCReadObject(decoder);
         __autoreleasing id key = FCReadObject(decoder);
-        CFDictionarySetValue((CFMutableDictionaryRef)dict, (const void *)key, (const void *)object);
+		CFDictionarySetValue((__bridge CFMutableDictionaryRef)dict, (__bridge const void *)key, (__bridge const void *)object);
     }
     return dict;
 }
@@ -486,7 +486,7 @@ static id FCReadMutableArray(__unsafe_unretained FCNSDecoder *decoder)
     FCCacheParsedObject(array, decoder->_objectCache);
     for (uint32_t i = 0; i < count; i++)
     {
-        CFArrayAppendValue((CFMutableArrayRef)array, (void *)FCReadObject(decoder));
+		CFArrayAppendValue((__bridge CFMutableArrayRef)array, (__bridge void *)FCReadObject(decoder));
     }
     return array;
 }
@@ -997,14 +997,14 @@ id FCParseData(NSData *data, FCTypeConstructor *constructors[])
 
 static inline NSUInteger FCCacheWrittenObject(__unsafe_unretained id object, __unsafe_unretained NSMutableDictionary *cache)
 {
-    NSUInteger count = (NSUInteger)CFDictionaryGetCount((CFMutableDictionaryRef)cache);
-    CFDictionarySetValue((CFMutableDictionaryRef)cache, (const void *)(object), (const void *)(count + 1));
+	NSUInteger count = (NSUInteger)CFDictionaryGetCount((__bridge CFMutableDictionaryRef)cache);
+	CFDictionarySetValue((__bridge CFMutableDictionaryRef)cache, (__bridge const void *)(object), (const void *)(count + 1));
     return count;
 }
 
 static inline NSUInteger FCIndexOfCachedObject(__unsafe_unretained id object, __unsafe_unretained NSMutableDictionary *cache)
 {
-    const void *index = CFDictionaryGetValue((CFMutableDictionaryRef)cache, (const void *)object);
+	const void *index = CFDictionaryGetValue((__bridge CFMutableDictionaryRef)cache, (__bridge const void *)object);
     if (index)
     {
         return ((NSUInteger)index) - 1;
@@ -1271,11 +1271,11 @@ static void FCWriteObject(__unsafe_unretained id object, __unsafe_unretained FCN
             NSUInteger count = [objectCache count];
             const void **keys = (const void **)malloc(count * sizeof(id));
             const NSUInteger *values = (const NSUInteger *)malloc(count * sizeof(NSUInteger));
-            CFDictionaryGetKeysAndValues((CFDictionaryRef)objectCache, keys, (const void **)values);
+            CFDictionaryGetKeysAndValues((__bridge CFDictionaryRef)objectCache, keys, (const void **)values);
             NSMutableDictionary *cache = [NSMutableDictionary dictionary];
             for (NSUInteger i = 0; i < count; i++)
             {
-                cache[@(values[i])] = (id)keys[i];
+                cache[@(values[i])] = (__bridge id)keys[i];
             }
             printf("Output cache:\n");
             for (NSUInteger i = 0; i < count; i++)
@@ -1623,7 +1623,7 @@ static void FCWriteObject(__unsafe_unretained id object, __unsafe_unretained FCN
 
 - (void)FC_encodeWithCoder:(__unsafe_unretained FCNSCoder *)coder
 {
-    switch (CFNumberGetType((CFNumberRef)self))
+	switch (CFNumberGetType((__bridge CFNumberRef)self))
     {
         case kCFNumberFloat32Type:
         case kCFNumberFloatType:
@@ -2182,7 +2182,7 @@ static id FCReadMutableDictionary_2_3(__unsafe_unretained FCNSDecoder *decoder)
     {
         __autoreleasing id object = FCReadObject_2_3(decoder);
         __autoreleasing id key = FCReadObject_2_3(decoder);
-        CFDictionarySetValue((CFMutableDictionaryRef)dict, (const void *)key, (const void *)object);
+		CFDictionarySetValue((__bridge CFMutableDictionaryRef)dict, (__bridge const void *)key, (__bridge const void *)object);
     }
     return dict;
 }
@@ -2216,7 +2216,7 @@ static id FCReadMutableArray_2_3(__unsafe_unretained FCNSDecoder *decoder)
     FCCacheParsedObject(array, decoder->_objectCache);
     for (uint32_t i = 0; i < count; i++)
     {
-        CFArrayAppendValue((CFMutableArrayRef)array, (void *)FCReadObject_2_3(decoder));
+		CFArrayAppendValue((__bridge CFMutableArrayRef)array, (__bridge void *)FCReadObject_2_3(decoder));
     }
     return array;
 }
