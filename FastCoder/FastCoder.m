@@ -1994,7 +1994,10 @@ static void FCWriteObject(__unsafe_unretained id object, __unsafe_unretained FCN
     FCWriteType(FCTypeURL, coder->_output);
     FCWriteObject(self.relativeString, coder);
     FCWriteObject(self.baseURL, coder);
+
+#ifndef GNUSTEP
     FCCacheWrittenObject(self, coder->_stringCache);
+#endif
 }
 
 @end
