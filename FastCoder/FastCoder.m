@@ -2004,6 +2004,8 @@ static void FCWriteObject(__unsafe_unretained id object, __unsafe_unretained FCN
 
 - (void)FC_encodeWithCoder:(__unsafe_unretained FCNSCoder *)coder
 {
+    [NSException raise:FastCodingException format:@"FastCoding is not available for NSValue in this version."];
+
     FCCacheWrittenObject(self, coder->_objectCache);
     const char *type = [self objCType];
     if (strcmp(type, @encode(CGPoint)) == 0 OR_IF_MAC(strcmp(type, @encode(NSPoint)) == 0))
