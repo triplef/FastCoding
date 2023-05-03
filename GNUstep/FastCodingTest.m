@@ -2,6 +2,10 @@
 
 #include "FastCoder.h"
 
+#ifndef ALog
+#define ALog(format, ...)	NSLog((@"%s [Line %d] " format), __FUNCTION__, __LINE__, ## __VA_ARGS__)
+#endif
+
 #if TARGET_OS_WIN32
     #define PLATFORM_SUFFIX @"windows"
 #elif TARGET_OS_OSX
