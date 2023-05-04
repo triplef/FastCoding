@@ -14,9 +14,9 @@
     #define PLATFORM_SUFFIX @"unsupported"
 #endif
 
-#define PLATFORMS @[@"windows"]
+#define PLATFORMS @[@"windows", @"macos"]
 
-@interface ModelObject1 : NSObject <NSCoding>
+@interface ModelObject1 : NSObject <NSSecureCoding>
 
 @property (nonatomic, copy) NSString *string1;
 @property (nonatomic, copy) NSDate *date1;
@@ -32,6 +32,11 @@
 @end
 
 @implementation ModelObject1
+
++ (BOOL)supportsSecureCoding
+{
+    return YES;
+}
 
 + (instancetype)testInstance
 {
@@ -52,14 +57,14 @@
 - (instancetype)initWithCoder:(NSCoder *)decoder
 {
     if (self = [super init]) {
-        _string1 = [decoder decodeObjectForKey: @"string1"];
-        _date1 = [decoder decodeObjectForKey: @"date1"];
-        _number1 = [decoder decodeObjectForKey: @"number1"];
-        _data1 = [decoder decodeObjectForKey: @"data1"];
-        _url1 = [decoder decodeObjectForKey: @"url1"];
+        self.string1 = [decoder decodeObjectOfClass:NSString.class forKey: @"string1"];
+        self.date1 = [decoder decodeObjectOfClass:NSDate.class forKey: @"date1"];
+        self.number1 = [decoder decodeObjectOfClass:NSNumber.class forKey: @"number1"];
+        self.data1 = [decoder decodeObjectOfClass:NSData.class forKey: @"data1"];
+        self.url1 = [decoder decodeObjectOfClass:NSURL.class forKey: @"url1"];
 
-        _integer1 = [decoder decodeIntegerForKey: @"integer1"];
-        _float1 = [decoder decodeFloatForKey: @"float1"];
+        self.integer1 = [decoder decodeIntegerForKey: @"integer1"];
+        self.float1 = [decoder decodeFloatForKey: @"float1"];
     }
 
     return self;
@@ -107,7 +112,7 @@
 
 @end
 
-@interface Model : NSObject <NSCoding>
+@interface Model : NSObject <NSSecureCoding>
 
 @property (nonatomic, strong) ModelObject1 *object1;
 @property (nonatomic, copy) NSSet<ModelObject1 *> *objectSet;
@@ -119,8 +124,12 @@
 
 @end
 
-
 @implementation Model
+
++ (BOOL)supportsSecureCoding
+{
+    return YES;
+}
 
 + (instancetype)testInstance
 {
@@ -154,11 +163,11 @@
 - (instancetype)initWithCoder:(NSCoder *)decoder
 {
     if (self = [super init]) {
-        _object1 = [decoder decodeObjectForKey: @"object1"];
-        _objectSet = [decoder decodeObjectForKey: @"objectSet"];
-        _objectOrderedSet = [decoder decodeObjectForKey: @"objectOrderedSet"];
-        _objectArray = [decoder decodeObjectForKey: @"objectArray"];
-        _objectDictionary = [decoder decodeObjectForKey: @"objectDictionary"];
+        self.object1 = [decoder decodeObjectOfClass:ModelObject1.class forKey: @"object1"];
+        self.objectSet = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[NSSet.class, ModelObject1.class]] forKey: @"objectSet"];
+        self.objectOrderedSet = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[NSOrderedSet.class, ModelObject1.class]] forKey: @"objectOrderedSet"];
+        self.objectArray =  [decoder decodeObjectOfClasses:[NSSet setWithArray:@[NSArray.class, ModelObject1.class]] forKey: @"objectArray"];
+        self.objectDictionary = [decoder decodeObjectOfClasses:[NSSet setWithArray:@[NSDictionary.class, NSString.class, ModelObject1.class]] forKey: @"objectDictionary"];
     }
 
     return self;
@@ -197,7 +206,7 @@
     [self testURL];
     [self testArchivedData];
     
-    // This types have been disabled due to compatiably concerns/issues with GNUstep
+    // This types have been disabled due to compatibility concerns/issues with GNUstep
     // [self testIndexSet];
     // [self testMutableIndexSet];
     // [self testPointValue];
@@ -349,7 +358,7 @@
     NSData *data = [FastCoder dataWithRootObject:input];
     NSValue *output = [FastCoder objectWithData:data];
 
-NSLog(@"INPUT %@ OUTPUT %@", NSStringFromClass([input class]), NSStringFromClass([output class]));
+    NSLog(@"INPUT %@ OUTPUT %@", NSStringFromClass([input class]), NSStringFromClass([output class]));
 
     assert([input class] == [output class]);
     assert([input isEqual:output]);
@@ -418,17 +427,16 @@ NSLog(@"INPUT %@ OUTPUT %@", NSStringFromClass([input class]), NSStringFromClass
     NSString *dataDirectoryPath = [NSUserDefaults.standardUserDefaults stringForKey:@"data"];
 
     for (NSString *platform in PLATFORMS) {
-        NSData *data = [NSData dataWithContentsOfFile:[dataDirectoryPath stringByAppendingPathComponent:[@"nscoded." stringByAppendingString:platform]]];
-        Model *nsCodedModel = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-
-        data = [NSData dataWithContentsOfFile:[dataDirectoryPath stringByAppendingPathComponent:[@"fastcoded." stringByAppendingString:platform]]];
-        Model *fastCodedModel = [FastCoder objectWithData:data];
+        NSData *nsCodedData = [NSData dataWithContentsOfFile:[dataDirectoryPath stringByAppendingPathComponent:[@"nscoded." stringByAppendingString:platform]]];
+        Model *nsCodedModel = [NSKeyedUnarchiver unarchivedObjectOfClass:Model.class fromData:nsCodedData error:NULL];
+        
+        NSData *fastCodedData = [NSData dataWithContentsOfFile:[dataDirectoryPath stringByAppendingPathComponent:[@"fastcoded." stringByAppendingString:platform]]];
+        Model *fastCodedModel = [FastCoder objectWithData:fastCodedData];
 
         assert([nsCodedModel class] == [fastCodedModel class]);
-        assert([nsCodedModel isEqual: fastCodedModel]);
+        assert([nsCodedModel isEqual:fastCodedModel]);
     }
 }
-
 
 @end
 
@@ -436,7 +444,6 @@ void printUsage()
 {
     NSLog(@"FastCodingTest -data <path to test data directory> [-generate <true | false>]");
 }
-
 
 int main(int argc, char *argv[])
 {
