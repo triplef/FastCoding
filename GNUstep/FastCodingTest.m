@@ -16,6 +16,32 @@
 
 #define PLATFORMS @[@"windows", @"macos"]
 
+#ifdef GNUSTEP
+
+@interface NSKeyedUnarchiver (Extras)
+
++ (id)unarchivedObjectOfClass:(Class)cls fromData:(NSData *)data error:(NSError **)error;
++ (id)unarchivedObjectOfClasses:(NSSet<Class> *)classes fromData:(NSData *)data error:(NSError * _Nullable *)error;
+
+@end
+
+@implementation NSKeyedUnarchiver (Extras)
+
++ (id)unarchivedObjectOfClass:(Class)cls fromData:(NSData *)data error:(NSError **)error
+{
+    return [self unarchivedObjectOfClasses:[NSSet setWithObject:cls] fromData:data error:error];
+}
+
++ (id)unarchivedObjectOfClasses:(NSSet<Class> *)classes fromData:(NSData *)data error:(NSError * _Nullable *)error
+{
+    return [self unarchiveObjectWithData:data];
+}
+
+@end
+
+#endif
+
+
 @interface ModelObject1 : NSObject <NSSecureCoding>
 
 @property (nonatomic, copy) NSString *string1;
