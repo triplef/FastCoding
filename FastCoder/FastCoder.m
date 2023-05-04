@@ -751,9 +751,7 @@ static id FCReadURL(__unsafe_unretained FCNSDecoder *decoder)
 
     __autoreleasing NSURL *URL = [NSURL URLWithString:obj1 relativeToURL:obj2];
 
-#ifndef GNUSTEP
-    FCCacheParsedObject(URL, decoder->_stringCache);
-#endif
+//    FCCacheParsedObject(URL.absoluteString, decoder->_stringCache);
     
     return URL;
 }
@@ -1999,9 +1997,7 @@ static void FCWriteObject(__unsafe_unretained id object, __unsafe_unretained FCN
     FCWriteObject(self.relativeString, coder);
     FCWriteObject(self.baseURL, coder);
 
-#ifndef GNUSTEP
-    FCCacheWrittenObject(self, coder->_stringCache);
-#endif
+    //FCCacheWrittenObject(self, coder->_stringCache);
 }
 
 @end
