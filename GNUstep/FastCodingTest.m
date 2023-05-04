@@ -10,6 +10,8 @@
     #define PLATFORM_SUFFIX @"windows"
 #elif TARGET_OS_OSX
     #define PLATFORM_SUFFIX @"macos"
+#elif TARGET_OS_ANDROID
+    #define PLATFORM_SUFFIX @"android"
 #else
     #define PLATFORM_SUFFIX @"unsupported"
 #endif
