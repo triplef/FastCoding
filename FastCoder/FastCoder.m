@@ -314,8 +314,7 @@ static id FCReadRawString(__unsafe_unretained FCNSDecoder *decoder)
     FC_ASSERT_FITS(length, *decoder->_offset, decoder->_total);
     if (length > 1)
     {
-        string = CFBridgingRelease(CFStringCreateWithBytes(NULL, decoder->_input + *decoder->_offset,
-                                                           (CFIndex)length - 1, kCFStringEncodingUTF8, false));
+        string = FC_AUTORELEASE([[NSString alloc] initWithBytes:(decoder->_input + *decoder->_offset) length:(length - 1) encoding:NSUTF8StringEncoding]);
     }
     else
     {
