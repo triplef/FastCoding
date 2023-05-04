@@ -1449,6 +1449,16 @@ static void FCWriteObject(__unsafe_unretained id object, __unsafe_unretained FCN
     return data.bytes;
 }
 
+#ifdef GNUSTEP
+
+- (id)decodeObjectOfClasses:(NSSet *)classes forKey:(NSString *)key
+{
+
+    return [self decodeObjectForKey:key];
+}
+
+#endif
+
 @end
 
 
