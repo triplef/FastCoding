@@ -4,6 +4,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64")
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.14.4)
 
+enable_testing()
+
 project(FastCodingTest LANGUAGES C CXX)
 
 if(WIN32 OR ANDROID)
@@ -14,9 +16,8 @@ if(WIN32 OR ANDROID)
 	include(${GNUSTEP_TOOLCHAIN_ROOT}/objc.cmake)
 endif()
 
-message(STATUS "GS libraries: ${CMAKE_OBJC_IMPLICIT_LINK_LIBRARIES}")
-
 add_executable(FastCodingTest)
+add_test(NAME FastCodingTest COMMAND FastCodingTest -data ${CMAKE_CURRENT_SOURCE_DIR}/data)
 
 target_include_directories(FastCodingTest PRIVATE
 	../FastCoder
@@ -39,3 +40,4 @@ else()
 	"-framework Foundation"
     )
 endif()
+
